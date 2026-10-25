@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14284f">
+<title>Kumpulkan Tugas – SMP Negeri 3 Panongan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #14284f;
+    --ink-2: #1f3d7a;
+    --paper: #f3f6fb;
+    --card: #ffffff;
+    --line: #d8e0ec;
+    --muted: #586a84;
+    --pencil: #f2b705;
+    --margin: #e5484d;
+    --ok: #17825a;
+    --ok-bg: #e6f5ee;
+    --bad: #b42323;
+    --bad-bg: #fdeceb;
+    --focus: #2a5bd7;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  [hidden] { display: none !important; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.5;
+    min-height: 100vh;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  button, input, select { font: inherit; color: inherit; }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
+
+  /* ---------- Header bergaris seperti buku tulis ---------- */
+  .masthead {
+    position: relative;
+    background-color: var(--ink);
+    background-image: repeating-linear-gradient(to bottom, transparent 0 31px, rgba(255,255,255,.08) 31px 32px);
+    color: #fff;
+    padding: calc(28px + env(safe-area-inset-top, 0px)) 20px 72px 52px;
+  }
+  .masthead::before {
+    content: ""; position: absolute; top: 0; bottom: 0; left: 34px; width: 2px; background: var(--margin); opacity: .85;
+  }
+  .masthead-inner { max-width: 560px; margin: 0 auto; padding-left: 0; }
+  .school { font-size: .85rem; font-weight: 600; color: #c4d2ef; }
+  .masthead h1 { font-size: clamp(1.6rem, 6vw, 2.1rem); font-weight: 800; line-height: 1.15; margin-top: 6px; letter-spacing: -.01em; }
+  .teacher { margin-top: 12px; display: inline-flex; align-items: center; gap: 8px; font-size: .88rem; font-weight: 600; background: rgba(255,255,255,.12); padding: 6px 12px; border-radius: 999px; }
+  .teacher i { width: 8px; height: 8px; border-radius: 50%; background: var(--pencil); display: block; }
+
+  /* ---------- Kartu utama ---------- */
+  .wrap { max-width: 560px; margin: -48px auto 0; padding: 0 14px 40px; position: relative; }
+  .demo-banner { background: #fff7d6; border: 1px solid #ecd778; color: #6a5300; border-radius: 10px; padding: 10px 14px; font-size: .85rem; margin-bottom: 12px; }
+  .card { background: var(--card); border-radius: 18px; box-shadow: 0 1px 2px rgba(20,40,79,.06), 0 14px 34px rgba(20,40,79,.12); padding: 22px 20px 24px; }
+
+  /* ---------- Langkah ---------- */
+  .steps { list-style: none; display: flex; align-items: flex-start; margin-bottom: 22px; }
+  .steps li { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; position: relative; font-size: .78rem; font-weight: 600; color: var(--muted); text-align: center; }
+  .steps li::before { content: ""; position: absolute; top: 15px; left: -50%; width: 100%; height: 3px; background: var(--line); z-index: 0; }
+  .steps li:first-child::before { display: none; }
+  .steps li.done::before, .steps li.active::before { background: var(--ink-2); }
+  .dot { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--card); border: 2px solid var(--line); font-weight: 700; font-size: .9rem; position: relative; z-index: 1; transition: background .25s, border-color .25s, color .25s; }
+  .steps li.active { color: var(--ink); }
+  .steps li.active .dot { border-color: var(--ink-2); background: var(--ink-2); color: #fff; }
+  .steps li.done .dot { border-color: var(--ink-2); background: var(--ink-2); color: #fff; font-size: 0; }
+  .steps li.done .dot::after { content: "✓"; font-size: .95rem; }
+
+  .panel h2 { font-size: 1.15rem; font-weight: 800; letter-spacing: -.005em; }
+  .panel .lead { color: var(--muted); font-size: .9rem; margin: 2px 0 18px; }
+  .panel:focus { outline: none; }
+
+  /* ---------- Form ---------- */
+  .field { margin-bottom: 18px; }
+  .field > label, .field > .legend { display: block; font-weight: 700; font-size: .92rem; margin-bottom: 7px; }
+  .text-in { width: 100%; padding: 13px 14px; border: 1.5px solid var(--line); border-radius: 10px; background: #fff; font-size: 1rem; transition: border-color .15s, box-shadow .15s; }
+  .text-in:focus { outline: none; border-color: var(--focus); box-shadow: 0 0 0 4px rgba(42,91,215,.15); }
+  .text-in::placeholder { color: #93a1b6; }
+  .field.invalid .text-in { border-color: var(--bad); }
+  .err { color: var(--bad); font-size: .84rem; font-weight: 600; margin-top: 6px; min-height: 0; }
+  .err:empty { display: none; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chips input { position: absolute; opacity: 0; pointer-events: none; }
+  .chips label { cursor: pointer; padding: 11px 18px; border: 1.5px solid var(--line); border-radius: 10px; font-weight: 700; font-size: .95rem; background: #fff; transition: all .15s; user-select: none; min-height: 46px; display: inline-flex; align-items: center; }
+  .chips.wide label { flex: 1 1 140px; justify-content: center; }
+  .chips label:hover { border-color: var(--ink-2); }
+  .chips input:checked + label { background: var(--ink); border-color: var(--ink); color: #fff; box-shadow: inset 0 -3px 0 var(--pencil); }
+  .chips input:focus-visible + label { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .field.invalid .chips label { border-color: var(--bad); }
+
+  .remember { display: flex; align-items: center; gap: 10px; font-size: .88rem; color: var(--muted); margin-top: 2px; }
+  .remember input { width: 18px; height: 18px; accent-color: var(--ink-2); }
+
+  /* ---------- Upload ---------- */
+  .dropzone { border: 2px dashed #9db3da; border-radius: var(--radius); background: #f7f9fd; padding: 26px 16px; text-align: center; transition: background .2s, border-color .2s; }
+  .dropzone.drag { background: #eaf0fc; border-color: var(--ink-2); }
+  .dz-title { font-weight: 700; margin-bottom: 4px; }
+  .dz-sub { font-size: .82rem; color: var(--muted); margin-bottom: 16px; }
+  .dz-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; cursor: pointer; font-weight: 700; border-radius: 10px; padding: 12px 18px; min-height: 48px; transition: transform .1s, background .15s, opacity .15s; }
+  .btn:active { transform: translateY(1px); }
+  .btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+  .btn-primary { background: var(--ink); color: #fff; box-shadow: inset 0 -3px 0 var(--pencil); }
+  .btn-primary:hover { background: var(--ink-2); }
+  .btn-ghost { background: #fff; color: var(--ink); border: 1.5px solid var(--line); }
+  .btn-ghost:hover { border-color: var(--ink-2); }
+  .btn-text { background: transparent; color: var(--bad); padding: 10px 12px; min-height: 44px; }
+  .btn[disabled] { opacity: .5; cursor: not-allowed; }
+
+  .tips { margin-top: 14px; font-size: .84rem; color: var(--muted); background: #f7f9fd; border-radius: 10px; padding: 10px 14px; }
+  .tips b { color: var(--ink); }
+
+  .busy { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 36px 0; color: var(--muted); font-weight: 600; }
+  .spinner { width: 22px; height: 22px; border-radius: 50%; border: 3px solid var(--line); border-top-color: var(--ink-2); animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .preview { border: 1.5px solid var(--line); border-radius: var(--radius); overflow: hidden; background: #fff; }
+  .preview-img-wrap { background: #e9eef6; display: grid; place-items: center; padding: 10px; }
+  .preview-img-wrap img { max-width: 100%; max-height: 320px; border-radius: 6px; display: block; box-shadow: 0 2px 10px rgba(20,40,79,.18); }
+  .preview-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; border-top: 1px solid var(--line); }
+  .file-meta { font-size: .82rem; color: var(--muted); min-width: 0; }
+  .file-meta b { display: block; color: var(--ink); font-size: .88rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 220px; }
+  .preview-actions { display: flex; gap: 4px; }
+
+  /* ---------- Ringkasan ---------- */
+  .summary { border: 1.5px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .summary-row { display: flex; justify-content: space-between; gap: 14px; padding: 12px 14px; border-bottom: 1px solid var(--line); font-size: .93rem; }
+  .summary-row:last-child { border-bottom: 0; }
+  .summary-row dt { color: var(--muted); font-weight: 600; flex: none; }
+  .summary-row dd { font-weight: 700; text-align: right; word-break: break-word; }
+  .summary-photo { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: #f7f9fd; }
+  .summary-photo img { width: 64px; height: 64px; object-fit: cover; border-radius: 8px; border: 1px solid var(--line); }
+  .summary-photo small { color: var(--muted); display: block; }
+
+  .nav { display: flex; gap: 10px; margin-top: 22px; }
+  .nav .btn-primary { flex: 1; }
+
+  /* ---------- Progres kirim ---------- */
+  .sending { margin-top: 22px; }
+  .sending-top { display: flex; justify-content: space-between; font-weight: 700; font-size: .92rem; margin-bottom: 8px; }
+  .bar { height: 12px; background: #e5ebf5; border-radius: 99px; overflow: hidden; }
+  .bar-fill { height: 100%; width: 0; background: var(--ink-2); border-radius: 99px; transition: width .2s ease; }
+  .bar-fill.indeterminate { width: 100% !important; background-image: repeating-linear-gradient(45deg, var(--ink-2) 0 12px, #3a5ca8 12px 24px); background-size: 34px 34px; animation: slide .8s linear infinite; }
+  @keyframes slide { to { background-position: 34px 0; } }
+  .sending small { display: block; margin-top: 8px; color: var(--muted); font-size: .84rem; }
+
+  .alert { margin-top: 16px; background: var(--bad-bg); color: var(--bad); border: 1px solid #f1c0bd; border-radius: 10px; padding: 12px 14px; font-size: .9rem; font-weight: 600; }
+  .alert small { display: block; font-weight: 500; margin-top: 2px; opacity: .85; }
+
+  /* ---------- Berhasil ---------- */
+  .done { text-align: center; }
+  .check { width: 84px; height: 84px; margin: 4px auto 14px; }
+  .check circle { fill: var(--ok-bg); stroke: var(--ok); stroke-width: 3; stroke-dasharray: 190; stroke-dashoffset: 190; animation: draw .6s .05s ease forwards; }
+  .check path { fill: none; stroke: var(--ok); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 50; stroke-dashoffset: 50; animation: draw .4s .55s ease forwards; }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  .done h2 { font-size: 1.4rem; font-weight: 800; }
+  .done .lead { color: var(--muted); font-size: .92rem; margin: 4px 0 18px; }
+  .receipt { text-align: left; border: 1.5px dashed #aab9d4; border-radius: var(--radius); padding: 4px 16px; background: #fbfcfe; }
+  .receipt .summary-row { padding: 11px 0; }
+  .code { font-weight: 800; font-size: 1.1rem; letter-spacing: .04em; font-variant-numeric: tabular-nums; }
+  .done .btn { margin-top: 18px; width: 100%; }
+
+  .foot { text-align: center; color: var(--muted); font-size: .78rem; margin-top: 18px; }
+
+  @media (min-width: 520px) {
+    .card { padding: 28px 30px 30px; }
+    .wrap { padding: 0 20px 56px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    .check circle, .check path { stroke-dashoffset: 0; }
+  }
+</style>
+</head>
+<body>
+
+<noscript><p style="padding:14px;background:#fdeceb;color:#b42323;font-weight:700;text-align:center">JavaScript dimatikan. Buka halaman ini di Chrome atau Safari agar formulir bisa dipakai.</p></noscript>
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="school">SMP Negeri 3 Panongan</div>
+    <h1>Kumpulkan tugas</h1>
+    <div class="teacher"><i></i>Pengajar: Mrs. Rahmah, S.Sos</div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="demo-banner" id="demoBanner" hidden>
+    <b>Mode contoh.</b> Tugas belum benar-benar terkirim. Isi <code>SCRIPT_URL</code> di bagian skrip dengan URL Web App Google Apps Script.
+  </div>
+
+  <div class="card">
+    <div id="flow">
+      <ol class="steps" id="stepper" aria-label="Langkah pengumpulan">
+        <li class="active"><span class="dot">1</span>Data diri</li>
+        <li><span class="dot">2</span>Foto tugas</li>
+        <li><span class="dot">3</span>Periksa dan kirim</li>
+      </ol>
+
+      <form id="form" novalidate>
+
+        <!-- LANGKAH 1 -->
+        <section class="panel" data-step="1" tabindex="-1">
+          <h2>Isi data dirimu</h2>
+          <p class="lead">Data ini dipakai guru untuk mencatat nilaimu.</p>
+
+          <div class="field" id="f-nama">
+            <label for="nama">Nama lengkap</label>
+            <input class="text-in" type="text" id="nama" autocomplete="name" placeholder="Contoh: Ahmad Fauzi" maxlength="60">
+            <div class="err" id="e-nama" role="alert"></div>
+          </div>
+
+          <div class="field" id="f-kelas">
+            <span class="legend" id="lg-kelas">Kelas</span>
+            <div class="chips" role="radiogroup" aria-labelledby="lg-kelas">
+              <input type="radio" name="kelas" id="k83" value="8.3"><label for="k83">8.3</label>
+              <input type="radio" name="kelas" id="k84" value="8.4"><label for="k84">8.4</label>
+              <input type="radio" name="kelas" id="k91" value="9.1"><label for="k91">9.1</label>
+              <input type="radio" name="kelas" id="k92" value="9.2"><label for="k92">9.2</label>
+            </div>
+            <div class="err" id="e-kelas" role="alert"></div>
+          </div>
+
+          <div class="field" id="f-absen">
+            <label for="absen">Nomor absen</label>
+            <input class="text-in" type="number" id="absen" inputmode="numeric" min="1" max="50" placeholder="Contoh: 5">
+            <div class="err" id="e-absen" role="alert"></div>
+          </div>
+
+          <div class="field" id="f-mapel">
+            <span class="legend" id="lg-mapel">Mata pelajaran</span>
+            <div class="chips wide" role="radiogroup" aria-labelledby="lg-mapel">
+              <input type="radio" name="mapel" id="m1" value="Bahasa Indonesia"><label for="m1">Bahasa Indonesia</label>
+              <input type="radio" name="mapel" id="m2" value="Bahasa Inggris"><label for="m2">Bahasa Inggris</label>
+            </div>
+            <div class="err" id="e-mapel" role="alert"></div>
+          </div>
+
+          <label class="remember"><input type="checkbox" id="remember"> Ingat data diriku di perangkat ini</label>
+
+          <div class="alert" id="formAlert" role="alert" hidden>Data belum lengkap. Periksa bagian yang bertanda merah di atas.</div>
+
+          <div class="nav"><button type="submit" class="btn btn-primary">Lanjut ke foto tugas</button></div>
+        </section>
+
+        <!-- LANGKAH 2 -->
+        <section class="panel" data-step="2" tabindex="-1" hidden>
+          <h2>Foto pekerjaanmu</h2>
+          <p class="lead">Foto halaman buku atau lembar tugas yang sudah kamu kerjakan.</p>
+
+          <div class="dropzone" id="dropzone">
+            <div id="dzEmpty">
+              <div class="dz-title">Ambil foto atau pilih dari galeri</div>
+              <div class="dz-sub">Format JPG, PNG, atau WebP. Maksimal 15 MB. Foto dikecilkan otomatis sebelum dikirim.</div>
+              <div class="dz-actions">
+                <button type="button" class="btn btn-primary" id="btnCamera">
+                  <svg viewBox="0 0 24 24"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Ambil foto
+                </button>
+                <button type="button" class="btn btn-ghost" id="btnGallery">
+                  <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m5 18 5-5 3 3 2-2 4 4"/></svg>Pilih dari galeri
+                </button>
+              </div>
+            </div>
+            <div class="busy" id="dzBusy" hidden><span class="spinner"></span>Menyiapkan foto…</div>
+          </div>
+
+          <div class="preview" id="preview" hidden>
+            <div class="preview-img-wrap"><img id="previewImg" alt="Pratinjau foto tugas"></div>
+            <div class="preview-bar">
+              <div class="file-meta"><b id="fileName">foto.jpg</b><span id="fileSize"></span></div>
+              <div class="preview-actions">
+                <button type="button" class="btn btn-ghost" id="btnRotate" aria-label="Putar foto 90 derajat">
+                  <svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.5-5.8M20 4v4h-4"/></svg>Putar
+                </button>
+                <button type="button" class="btn btn-text" id="btnRemove" aria-label="Hapus foto">
+                  <svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/></svg>Ganti
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="err" id="e-file" role="alert"></div>
+          <input type="file" id="fileCamera" accept="image/*" capture="environment" hidden>
+          <input type="file" id="fileGallery" accept="image/jpeg,image/png,image/webp,image/*" hidden>
+
+          <div class="tips"><b>Supaya nilai tidak tertunda:</b> pastikan tulisan terbaca, cahaya cukup, dan seluruh halaman masuk dalam foto.</div>
+
+          <div class="nav">
+            <button type="button" class="btn btn-ghost" data-back>Kembali</button>
+            <button type="submit" class="btn btn-primary">Periksa data</button>
+          </div>
+        </section>
+
+        <!-- LANGKAH 3 -->
+        <section class="panel" data-step="3" tabindex="-1" hidden>
+          <h2>Periksa sebelum mengirim</h2>
+          <p class="lead">Pastikan semuanya benar. Setelah terkirim, data tidak bisa diubah dari halaman ini.</p>
+
+          <div class="summary">
+            <dl>
+              <div class="summary-row"><dt>Nama</dt><dd id="sNama"></dd></div>
+              <div class="summary-row"><dt>Kelas</dt><dd id="sKelas"></dd></div>
+              <div class="summary-row"><dt>Nomor absen</dt><dd id="sAbsen"></dd></div>
+              <div class="summary-row"><dt>Mata pelajaran</dt><dd id="sMapel"></dd></div>
+            </dl>
+            <div class="summary-photo"><img id="sImg" alt="Foto tugas yang akan dikirim"><div><b>Foto tugas</b><small id="sFile"></small></div></div>
+          </div>
+
+          <div class="sending" id="sending" hidden aria-live="polite">
+            <div class="sending-top"><span id="sendStage">Mengunggah…</span><span id="sendPct">0%</span></div>
+            <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="barRole"><div class="bar-fill" id="barFill"></div></div>
+            <small>Jangan tutup halaman ini sampai muncul tanda berhasil.</small>
+          </div>
+          <div class="alert" id="sendError" role="alert" hidden></div>
+
+          <div class="nav" id="navSend">
+            <button type="button" class="btn btn-ghost" data-back id="btnBack3">Kembali</button>
+            <button type="submit" class="btn btn-primary" id="btnSend">Kirim tugas</button>
+          </div>
+        </section>
+      </form>
+    </div>
+
+    <!-- BERHASIL -->
+    <div class="done" id="done" hidden aria-live="polite">
+      <svg class="check" viewBox="0 0 84 84" aria-hidden="true"><circle cx="42" cy="42" r="30"/><path d="M29 43l9 9 18-20"/></svg>
+      <h2 tabindex="-1" id="doneTitle">Tugas terkirim</h2>
+      <p class="lead">Mrs. Rahmah akan memeriksa pekerjaanmu. Simpan kode di bawah atau tangkap layar sebagai bukti.</p>
+      <dl class="receipt">
+        <div class="summary-row"><dt>Kode bukti</dt><dd class="code" id="rKode"></dd></div>
+        <div class="summary-row"><dt>Nama</dt><dd id="rNama"></dd></div>
+        <div class="summary-row"><dt>Kelas dan absen</dt><dd id="rKelas"></dd></div>
+        <div class="summary-row"><dt>Mata pelajaran</dt><dd id="rMapel"></dd></div>
+        <div class="summary-row"><dt>Waktu kirim</dt><dd id="rWaktu"></dd></div>
+      </dl>
+      <button type="button" class="btn btn-primary" id="btnAgain">Kirim tugas lain</button>
+    </div>
+  </div>
+
+  <p class="foot">Portal pengumpulan tugas · SMP Negeri 3 Panongan</p>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  // ====== PENGATURAN ======
+  const CONFIG = {
+    SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwcnra8TOUZIfITp7-7zUCxR8JkCUbVyjoNpD0rK8dyqEWiRkJlpZZmklwn7tP4BIdQRg/exec", // ganti dengan URL Web App
+    MAX_ORIGINAL_MB: 15,   // batas foto asli
+    MAX_DIMENSION: 1600,   // sisi terpanjang foto setelah dikecilkan (px)
+    JPEG_QUALITY: 0.75,
+    TIMEOUT_MS: 90000
+  };
+  const DEMO = CONFIG.SCRIPT_URL.indexOf("URL_GOOGLE") !== -1;
+  const STORE_KEY = "portalTugas.identitas";
+
+  const $ = (s, r) => (r || document).querySelector(s);
+  const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const state = { step: 1, file: null, rotation: 0, b64: null, previewUrl: null, bytes: 0, sending: false, kode: "" };
+
+  if (DEMO) $('#demoBanner').hidden = false;
+
+  // ====== NAVIGASI LANGKAH ======
+  function goTo(n) {
+    state.step = n;
+    $$('.panel').forEach(p => { p.hidden = Number(p.dataset.step) !== n; });
+    $$('#stepper li').forEach((li, i) => {
+      li.classList.toggle('done', i + 1 < n);
+      li.classList.toggle('active', i + 1 === n);
+      li.querySelector('.dot').textContent = i + 1;
+    });
+    const panel = $('.panel[data-step="' + n + '"]');
+    window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+    panel.focus({ preventScroll: true });
+  }
+  $$('[data-back]').forEach(b => b.addEventListener('click', () => { if (!state.sending) goTo(state.step - 1); }));
+
+  // ====== VALIDASI LANGKAH 1 ======
+  function setErr(id, msg) {
+    $('#e-' + id).textContent = msg || "";
+    const f = $('#f-' + id);
+    if (f) f.classList.toggle('invalid', !!msg);
+  }
+  function getIdentity() {
+    return {
+      nama: $('#nama').value.replace(/\s+/g, ' ').trim(),
+      kelas: ($('input[name="kelas"]:checked') || {}).value || "",
+      absen: $('#absen').value.trim(),
+      mapel: ($('input[name="mapel"]:checked') || {}).value || ""
+    };
+  }
+  function nameOk(s) {
+    try { return new RegExp("^[\\p{L}\\s.'’\\-]+$", "u").test(s); }
+    catch (e) { return !/[0-9_@#$%^&*()+=<>\/\\|{}\[\]~`!?;:,"]/.test(s); }
+  }
+  function validateStep1() {
+    const d = getIdentity();
+    let ok = true, firstId = null;
+    const fail = (id, msg) => { setErr(id, msg); ok = false; if (!firstId) firstId = id; };
+
+    ['nama', 'kelas', 'absen', 'mapel'].forEach(id => setErr(id));
+    if (d.nama.length < 3) fail('nama', 'Tulis nama lengkapmu, minimal 3 huruf.');
+    else if (!nameOk(d.nama)) fail('nama', 'Nama hanya boleh berisi huruf. Hapus angka atau simbol.');
+    if (!d.kelas) fail('kelas', 'Pilih kelasmu.');
+    const n = Number(d.absen);
+    if (!d.absen || !Number.isInteger(n) || n < 1 || n > 50) fail('absen', 'Isi nomor absen dengan angka 1 sampai 50.');
+    if (!d.mapel) fail('mapel', 'Pilih mata pelajaran.');
+
+    $('#formAlert').hidden = ok;
+    if (!ok) {
+      $('#f-' + firstId).scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+      const el = firstId === 'nama' || firstId === 'absen' ? $('#' + firstId) : null;
+      if (el) el.focus({ preventScroll: true });
+    }
+    return ok;
+  }
+  ['nama', 'absen'].forEach(id => $('#' + id).addEventListener('input', () => { setErr(id); $('#formAlert').hidden = true; }));
+  $$('input[name="kelas"]').forEach(r => r.addEventListener('change', () => setErr('kelas')));
+  $$('input[name="mapel"]').forEach(r => r.addEventListener('change', () => setErr('mapel')));
+
+  // ====== INGAT DATA (opsional) ======
+  function loadIdentity() {
+    try {
+      const raw = localStorage.getItem(STORE_KEY);
+      if (!raw) return;
+      const d = JSON.parse(raw);
+      if (d.nama) $('#nama').value = d.nama;
+      if (d.absen) $('#absen').value = d.absen;
+      const k = $$('input[name="kelas"]').find(r => r.value === d.kelas); if (k) k.checked = true;
+      const m = $$('input[name="mapel"]').find(r => r.value === d.mapel); if (m) m.checked = true;
+      $('#remember').checked = true;
+    } catch (e) { /* abaikan */ }
+  }
+  function saveIdentity(d) {
+    try {
+      if ($('#remember').checked) localStorage.setItem(STORE_KEY, JSON.stringify(d));
+      else localStorage.removeItem(STORE_KEY);
+    } catch (e) { /* abaikan */ }
+  }
+  loadIdentity();
+
+  // ====== FOTO ======
+  const dz = $('#dropzone');
+  $('#btnCamera').addEventListener('click', () => $('#fileCamera').click());
+  $('#btnGallery').addEventListener('click', () => $('#fileGallery').click());
+  $('#fileCamera').addEventListener('change', e => pickFile(e.target.files[0], e.target));
+  $('#fileGallery').addEventListener('change', e => pickFile(e.target.files[0], e.target));
+  ['dragenter', 'dragover'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('drag'); }));
+  ['dragleave', 'drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('drag'); }));
+  dz.addEventListener('drop', e => pickFile(e.dataTransfer.files[0]));
+
+  function fmtSize(b) { return b >= 1048576 ? (b / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB'; }
+
+  async function pickFile(file, input) {
+    if (!file) return;
+    setErr('file');
+    if (!/^image\//.test(file.type)) { setErr('file', 'File harus berupa foto (JPG, PNG, atau WebP).'); return; }
+    if (file.size > CONFIG.MAX_ORIGINAL_MB * 1048576) { setErr('file', 'Foto terlalu besar. Maksimal ' + CONFIG.MAX_ORIGINAL_MB + ' MB.'); return; }
+    state.file = file; state.rotation = 0;
+    await processImage();
+    if (input) input.value = "";
+  }
+
+  async function loadBitmap(file) {
+    if (window.createImageBitmap) {
+      try { return await createImageBitmap(file, { imageOrientation: 'from-image' }); } catch (e) { /* lanjut ke cadangan */ }
+    }
+    return await new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file), img = new Image();
+      img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('decode')); };
+      img.src = url;
+    });
+  }
+
+  async function processImage() {
+    $('#dzEmpty').hidden = true; $('#dzBusy').hidden = false; $('#preview').hidden = true;
+    try {
+      const bmp = await loadBitmap(state.file);
+      const sw = bmp.width, sh = bmp.height;
+      const scale = Math.min(1, CONFIG.MAX_DIMENSION / Math.max(sw, sh));
+      const w = Math.round(sw * scale), h = Math.round(sh * scale);
+      const swap = state.rotation % 180 !== 0;
+      const canvas = document.createElement('canvas');
+      canvas.width = swap ? h : w; canvas.height = swap ? w : h;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate(state.rotation * Math.PI / 180);
+      ctx.drawImage(bmp, -w / 2, -h / 2, w, h);
+      if (bmp.close) bmp.close();
+      const dataUrl = canvas.toDataURL('image/jpeg', CONFIG.JPEG_QUALITY);
+      state.b64 = dataUrl.split(',')[1];
+      state.bytes = Math.round(state.b64.length * 0.75);
+      state.previewUrl = dataUrl;
+      $('#previewImg').src = dataUrl;
+      $('#fileName').textContent = state.file.name;
+      $('#fileSize').textContent = 'Asli ' + fmtSize(state.file.size) + ' → dikirim ' + fmtSize(state.bytes);
+      $('#dzBusy').hidden = true; dz.hidden = true; $('#preview').hidden = false;
+    } catch (e) {
+      clearPhoto();
+      setErr('file', 'Foto tidak bisa dibuka. Coba ambil ulang dengan kamera, atau pilih foto berformat JPG atau PNG.');
+    }
+  }
+  function clearPhoto() {
+    state.file = null; state.b64 = null; state.bytes = 0; state.previewUrl = null; state.rotation = 0;
+    $('#preview').hidden = true; $('#dzBusy').hidden = true; $('#dzEmpty').hidden = false; dz.hidden = false;
+    $('#previewImg').removeAttribute('src');
+  }
+  $('#btnRotate').addEventListener('click', async () => { state.rotation = (state.rotation + 90) % 360; await processImage(); });
+  $('#btnRemove').addEventListener('click', () => { clearPhoto(); setErr('file'); });
+
+  // ====== RINGKASAN ======
+  function fillSummary() {
+    const d = getIdentity();
+    $('#sNama').textContent = d.nama; $('#sKelas').textContent = d.kelas;
+    $('#sAbsen').textContent = d.absen; $('#sMapel').textContent = d.mapel;
+    $('#sImg').src = state.previewUrl; $('#sFile').textContent = fmtSize(state.bytes);
+    $('#sendError').hidden = true;
+  }
+
+  // ====== KIRIM ======
+  function makeKode() {
+    const t = new Date();
+    const ymd = String(t.getFullYear()).slice(2) + String(t.getMonth() + 1).padStart(2, '0') + String(t.getDate()).padStart(2, '0');
+    const rnd = Math.random().toString(36).slice(2, 6).toUpperCase();
+    return 'TGS-' + ymd + '-' + rnd;
+  }
+  function setProgress(pct, stage, indeterminate) {
+    $('#barFill').style.width = pct + '%';
+    $('#barFill').classList.toggle('indeterminate', !!indeterminate);
+    $('#barRole').setAttribute('aria-valuenow', Math.round(pct));
+    $('#sendPct').textContent = indeterminate ? '' : Math.round(pct) + '%';
+    if (stage) $('#sendStage').textContent = stage;
+  }
+  function postToScript(payload) {
+    if (DEMO) {
+      return new Promise(res => {
+        let p = 0;
+        const t = setInterval(() => {
+          p += 12 + Math.random() * 10;
+          if (p >= 100) { clearInterval(t); setProgress(100, 'Menyimpan ke Drive dan Sheets…', true); setTimeout(() => res({ result: 'success' }), 900); }
+          else setProgress(p, 'Mengunggah foto…');
+        }, 180);
+      });
+    }
+    // fetch tanpa header khusus = permintaan "sederhana", tidak memicu preflight (Apps Script tidak menjawab OPTIONS)
+    setProgress(100, 'Mengirim foto dan menyimpan ke Drive dan Sheets…', true);
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), CONFIG.TIMEOUT_MS);
+    return fetch(CONFIG.SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload), signal: ctrl.signal })
+      .then(r => r.text())
+      .then(txt => {
+        let j;
+        try { j = JSON.parse(txt); }
+        catch (e) { throw new Error('Respons server tidak dikenali. Pastikan deployment Apps Script diatur “Siapa saja”.'); }
+        if (j.result !== 'success') throw new Error(j.error || 'Server menolak data.');
+        return j;
+      })
+      .catch(err => {
+        if (err.name === 'AbortError') throw new Error('Waktu habis. Sinyal terlalu lemah.');
+        if (err instanceof TypeError) throw new Error('Jaringan terputus atau URL Apps Script salah.');
+        throw err;
+      })
+      .finally(() => clearTimeout(timer));
+  }
+
+  async function sendTask() {
+    if (state.sending) return;
+    if (!navigator.onLine) { showSendError('Kamu sedang offline.', 'Sambungkan ke internet, lalu tekan Kirim tugas lagi.'); return; }
+    const d = getIdentity();
+    state.kode = state.kode || makeKode();
+    state.sending = true;
+    $('#sendError').hidden = true; $('#sending').hidden = false;
+    $('#navSend').hidden = true;
+    setProgress(0, 'Mengunggah foto…');
+    try {
+      await postToScript({ nama: d.nama, kelas: d.kelas, absen: d.absen, mapel: d.mapel, kode: state.kode,
+        filename: state.file.name, mimeType: 'image/jpeg', data: state.b64 });
+      saveIdentity(d);
+      showDone(d);
+    } catch (err) {
+      $('#sending').hidden = true; $('#navSend').hidden = false;
+      showSendError('Tugas belum terkirim.', err.message + ' Datamu masih aman di sini, coba kirim lagi.');
+    } finally { state.sending = false; }
+  }
+  function showSendError(title, detail) {
+    const box = $('#sendError');
+    box.innerHTML = ''; box.append(title);
+    const s = document.createElement('small'); s.textContent = detail; box.appendChild(s);
+    box.hidden = false;
+  }
+
+  function showDone(d) {
+    $('#rKode').textContent = state.kode;
+    $('#rNama').textContent = d.nama;
+    $('#rKelas').textContent = 'Kelas ' + d.kelas + ', absen ' + d.absen;
+    $('#rMapel').textContent = d.mapel;
+    $('#rWaktu').textContent = new Date().toLocaleString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    $('#flow').hidden = true; $('#done').hidden = false;
+    window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+    $('#doneTitle').focus({ preventScroll: true });
+  }
+
+  $('#btnAgain').addEventListener('click', () => {
+    clearPhoto(); state.kode = "";
+    $('#sending').hidden = true; $('#navSend').hidden = false;
+    $('#form').reset(); loadIdentity();
+    $('#done').hidden = true; $('#flow').hidden = false;
+    goTo(1);
+  });
+
+  // ====== SUBMIT (satu pintu untuk semua langkah) ======
+  $('#form').addEventListener('submit', e => {
+    e.preventDefault();
+    if (state.step === 1) { if (validateStep1()) goTo(2); }
+    else if (state.step === 2) {
+      if (!state.b64) { setErr('file', 'Pilih atau ambil foto tugasmu dulu.'); return; }
+      fillSummary(); goTo(3);
+    } else sendTask();
+  });
+})();
+</script>
+</body>
+</html>
